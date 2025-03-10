@@ -1,0 +1,50 @@
+using Microsoft.AspNetCore.Mvc;
+using MoneyEzBank.API;
+using MoneyEzBank.API.Middlewares;
+using MoneyEzBank.Services.BusinessModels;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+
+builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context.ModelState
+            .Where(m => m.Value.Errors.Count > 0)
+            .SelectMany(m => m.Value.Errors)
+            .Select(e => e.ErrorMessage)
+            .ToList();
+
+        var response = new BaseResultModel
+        {
+            Status = StatusCodes.Status400BadRequest,
+            Message = string.Join("; ", errors)
+        };
+
+        return new BadRequestObjectResult(response);
+    };
+});
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddWebAPIService(builder);
+builder.Services.AddInfractstructure(builder.Configuration);
+
+var app = builder.Build();
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
+app.UseAuthentication();
+
+app.MapControllers();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+app.Run();
