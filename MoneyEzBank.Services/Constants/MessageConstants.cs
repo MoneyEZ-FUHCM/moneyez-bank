@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MoneyEzBank.Services.Constants
 {
-    public class MessageContants
+    public class MessageConstants
     {
         // syntax error code: <CONSTANT_NAME> = "MessagePascalCaseCode";
         // syntax message: <CONSTANT_NAME_MESSAGE> = "Message here";

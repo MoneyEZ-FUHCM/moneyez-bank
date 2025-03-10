@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MoneyEzBank.Repositories.Entities;
+using MoneyEzBank.Repositories.Repositories.Implements;
+using MoneyEzBank.Repositories.Repositories.Interfaces;
 using MoneyEzBank.Repositories.UnitOfWork;
 using MoneyEzBank.Services.Mappers;
 using MoneyEzBank.Services.Services.Implements;
@@ -107,6 +109,10 @@ namespace MoneyEzBank.API
 
             // config claim service
             services.AddScoped<IClaimsService, ClaimsService>();
+
+            // config user service
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUserService, UserService>();
 
             #endregion
 

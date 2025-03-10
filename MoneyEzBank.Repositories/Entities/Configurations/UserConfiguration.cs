@@ -15,6 +15,9 @@ namespace MoneyEzBank.Repositories.Entities.Configurations
                 .IsRequired()
                 .HasMaxLength(150);
 
+            builder.Property(u => u.FullName)
+                .HasMaxLength(150);
+
             builder.Property(u => u.Email).HasMaxLength(150)
                 .IsRequired();
 
