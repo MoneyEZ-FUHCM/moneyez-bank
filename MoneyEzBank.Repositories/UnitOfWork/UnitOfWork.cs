@@ -17,6 +17,10 @@ namespace MoneyEzBank.Repositories.UnitOfWork
 
         private IUserRepository _userRepository;
 
+        private IAccountRepository _accountRepository;
+
+        private ITransactionRepository _transactionRepository;
+
         public UnitOfWork(MoneyEzBankContext context)
         {
             _context = context;
@@ -28,6 +32,22 @@ namespace MoneyEzBank.Repositories.UnitOfWork
             {
                 return _userRepository ??= new UserRepository(_context);
 
+            }
+        }
+
+        public IAccountRepository AccountsRepository
+        {
+            get
+            {
+                return _accountRepository ??= new AccountRepository(_context);
+            }
+        }
+
+        public ITransactionRepository TransactionsRepository
+        {
+            get
+            {
+                return _transactionRepository ??= new TransactionRepository(_context);
             }
         }
 

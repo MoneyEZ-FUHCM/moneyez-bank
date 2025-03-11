@@ -10,6 +10,8 @@ namespace MoneyEzBank.Repositories.UnitOfWork
     public interface IUnitOfWork : IDisposable
     {
         IUserRepository UsersRepository { get; }
+        IAccountRepository AccountsRepository { get; }
+        ITransactionRepository TransactionsRepository { get; }
         int Save();
         void Commit();
         void Rollback();

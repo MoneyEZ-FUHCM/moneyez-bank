@@ -113,6 +113,10 @@ namespace MoneyEzBank.API
             // config user service
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<ITransactionRepository, TransactionRepository>();
+            services.AddScoped<ITransactionService, TransactionService>();
 
             #endregion
 
@@ -122,7 +126,8 @@ namespace MoneyEzBank.API
 
             services.AddDbContext<MoneyEzBankContext>(options =>
             {
-                options.UseSqlServer(config.GetConnectionString("MoneyEzBankLocal"));
+                //options.UseSqlServer(config.GetConnectionString("MoneyEzBankLocal"));
+                options.UseSqlServer(config.GetConnectionString("MoneyEzBankVps"));
             });
 
             #endregion
