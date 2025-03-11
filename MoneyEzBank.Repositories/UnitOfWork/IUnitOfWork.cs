@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MoneyEzBank.Repositories.Repositories.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,9 @@ namespace MoneyEzBank.Repositories.UnitOfWork
 {
     public interface IUnitOfWork : IDisposable
     {
+        IUserRepository UsersRepository { get; }
+        IAccountRepository AccountsRepository { get; }
+        ITransactionRepository TransactionsRepository { get; }
         int Save();
         void Commit();
         void Rollback();

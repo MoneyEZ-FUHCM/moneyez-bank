@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MoneyEzBank.Repositories.Entities;
+using MoneyEzBank.Repositories.Repositories.Implements;
+using MoneyEzBank.Repositories.Repositories.Interfaces;
 using MoneyEzBank.Repositories.UnitOfWork;
 using MoneyEzBank.Services.Mappers;
 using MoneyEzBank.Services.Services.Implements;
@@ -108,6 +110,14 @@ namespace MoneyEzBank.API
             // config claim service
             services.AddScoped<IClaimsService, ClaimsService>();
 
+            // config user service
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<ITransactionRepository, TransactionRepository>();
+            services.AddScoped<ITransactionService, TransactionService>();
+
             #endregion
 
             #region config database
@@ -116,7 +126,8 @@ namespace MoneyEzBank.API
 
             services.AddDbContext<MoneyEzBankContext>(options =>
             {
-                options.UseSqlServer(config.GetConnectionString("MoneyEzBankLocal"));
+                //options.UseSqlServer(config.GetConnectionString("MoneyEzBankLocal"));
+                options.UseSqlServer(config.GetConnectionString("MoneyEzBankVps"));
             });
 
             #endregion
