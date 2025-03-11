@@ -4,8 +4,8 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER $APP_UID
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+EXPOSE 8088
+EXPOSE 8089
 
 
 # This stage is used to build the service project
@@ -29,4 +29,9 @@ RUN dotnet publish "./MoneyEzBank.API.csproj" -c $BUILD_CONFIGURATION -o /app/pu
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+# Cấu hình ứng dụng chạy ở cổng 8088
+ENV ASPNETCORE_URLS=http://+:8088
+
+# Expose lại cổng 8088 để Docker biết container đang mở cổng này
+EXPOSE 8088
 ENTRYPOINT ["dotnet", "MoneyEzBank.API.dll"]
