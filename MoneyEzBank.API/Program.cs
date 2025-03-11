@@ -6,6 +6,7 @@ using MoneyEzBank.Services.BusinessModels;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+var basePath = builder.Configuration.GetValue<string>("ApiSettings:BasePath") ?? "/moneyez-bank";
 
 builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
 {
@@ -34,8 +35,15 @@ builder.Services.AddInfractstructure(builder.Configuration);
 
 var app = builder.Build();
 
+// Configure the base path before other middleware
+app.UsePathBase(basePath);
+app.UseRouting();
+
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint($"{basePath}/swagger/v1/swagger.json", "MoneyEzBank API V1");
+});
 
 app.UseCors("app-cors");
 
