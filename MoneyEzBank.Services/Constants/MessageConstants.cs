@@ -12,13 +12,14 @@ namespace MoneyEzBank.Services.Constants
         // syntax message: <CONSTANT_NAME_MESSAGE> = "Message here";
 
         // authen
-        public const string INVALID_EMAIL_PASSWORD = "InvalidEmailOrPassword";
-        public const string TOKEN_NOT_VALID = "TokenNotValid";
+        public const string INVALID_EMAIL_PASSWORD_CODE = "InvalidEmailOrPassword";
+        public const string TOKEN_NOT_VALID_CODE = "TokenNotValid";
 
         // user
-        public const string USER_NOT_EXIST = "UserNotExist";
-        public const string USER_EXISTED = "UserExisted";
-        public const string USER_BLOCKED = "UserNotActive";
-        public const string USER_DUPLICATE_PHONE_NUMBER = "DuplicatePhoneNumber";
+        public const string USER_NOT_EXIST_CODE = "UserNotExist";
+        public const string USER_IS_CURRENT_CODE = "UserIsCurrent";
+        public const string USER_EXISTED_CODE = "UserExisted";
+        public const string USER_BANNED_CODE = "UserHasBanned";
+        public const string USER_DUPLICATE_PHONE_NUMBER_CODE = "DuplicatePhoneNumber";
     }
 }

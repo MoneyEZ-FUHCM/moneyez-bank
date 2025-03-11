@@ -2,6 +2,7 @@
 using MoneyEzBank.Repositories.Commons.Filter;
 using MoneyEzBank.Services.BusinessModels;
 using MoneyEzBank.Services.BusinessModels.AuthenModels;
+using MoneyEzBank.Services.BusinessModels.UserModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,9 +27,9 @@ namespace MoneyEzBank.Services.Services.Interfaces
 
         public Task<BaseResultModel> GetUserPaginationAsync(PaginationParameter paginationParameter, UserFilter userFilter);
 
-        //public Task<BaseResultModel> CreateUserAsync(CreateUserModel model);
+        public Task<BaseResultModel> CreateUserAsync(CreateUserModel model);
 
-        //public Task<BaseResultModel> UpdateUserAsync(UpdateUserModel model);
+        public Task<BaseResultModel> UpdateUserAsync(UpdateUserModel model);
 
         public Task<BaseResultModel> DeleteUserAsync(Guid id, string currentEmail);
 
