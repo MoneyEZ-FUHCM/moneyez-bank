@@ -35,6 +35,7 @@ namespace MoneyEzBank.Services.Constants
         public const string ACCOUNT_INVALID_BALANCE_CODE = "InitialBalanceCannotBeNegative";
         public const string ACCOUNT_CREATE_SUCCESS_MESSAGE = "Account created successfully";
         public const string ACCOUNT_UPDATE_SUCCESS_MESSAGE = "Account updated successfully";
+        public const string ACCOUNT_CREATE_FAIL_MESSAGE_CODE = "AccountCreatedFailed";
 
         // transaction
         public const string TRANSACTION_INVALID_AMOUNT_CODE = "InvalidTransactionAmount";
@@ -44,5 +45,9 @@ namespace MoneyEzBank.Services.Constants
         public const string TRANSACTION_DEPOSIT_SUCCESS_MESSAGE = "Deposit completed successfully";
         public const string TRANSACTION_WITHDRAWAL_SUCCESS_MESSAGE = "Withdrawal completed successfully";
         public const string TRANSACTION_TRANSFER_SUCCESS_MESSAGE = "Transfer completed successfully";
+        public const string TRANSACTION_TRANSFER_EXTERNAL_NOT_SUPPORT_CODE = "ExternalTransferNotSupport";
+
+        // webhook
+        public const string WEBHOOK_NOT_EXIST_CODE = "WebhookNotExist";
     }
 }

@@ -21,6 +21,8 @@ namespace MoneyEzBank.Repositories.UnitOfWork
 
         private ITransactionRepository _transactionRepository;
 
+        private IWebhookConfigRepository _webhookConfigRepository;
+
         public UnitOfWork(MoneyEzBankContext context)
         {
             _context = context;
@@ -48,6 +50,14 @@ namespace MoneyEzBank.Repositories.UnitOfWork
             get
             {
                 return _transactionRepository ??= new TransactionRepository(_context);
+            }
+        }
+
+        public IWebhookConfigRepository WebhookConfigRepository
+        {
+            get
+            {
+                return _webhookConfigRepository ??= new WebhookConfigRepository(_context);
             }
         }
 

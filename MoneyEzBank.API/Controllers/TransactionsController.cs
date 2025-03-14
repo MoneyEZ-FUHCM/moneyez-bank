@@ -19,21 +19,21 @@ namespace MoneyEzBank.API.Controllers
 
         [HttpPost("deposit")]
         [Authorize]
-        public Task<IActionResult> Deposit(CreateTransactionModel model)
+        public Task<IActionResult> Deposit(CreateDepositModel model)
         {
             return ValidateAndExecute(() => _transactionService.DepositAsync(model));
         }
 
         [HttpPost("withdraw")]
         [Authorize]
-        public Task<IActionResult> Withdraw(CreateTransactionModel model)
+        public Task<IActionResult> Withdraw(CreateWithdrawModel model)
         {
             return ValidateAndExecute(() => _transactionService.WithdrawAsync(model));
         }
 
         [HttpPost("transfer")]
         [Authorize]
-        public Task<IActionResult> Transfer(CreateTransactionModel model)
+        public Task<IActionResult> Transfer(CreateTransferModel model)
         {
             return ValidateAndExecute(() => _transactionService.TransferAsync(model));
         }

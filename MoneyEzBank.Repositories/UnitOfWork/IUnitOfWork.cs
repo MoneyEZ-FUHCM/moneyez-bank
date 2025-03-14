@@ -12,6 +12,7 @@ namespace MoneyEzBank.Repositories.UnitOfWork
         IUserRepository UsersRepository { get; }
         IAccountRepository AccountsRepository { get; }
         ITransactionRepository TransactionsRepository { get; }
+        IWebhookConfigRepository WebhookConfigRepository { get; }
         int Save();
         void Commit();
         void Rollback();

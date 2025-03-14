@@ -95,6 +95,12 @@ namespace MoneyEzBank.API
 
             #endregion
 
+            services.AddHttpClient("WebhookClient", client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(
+                    builder.Configuration.GetValue<int>("WebhookSettings:Timeout"));
+            });
+
             return services;
         }
 
@@ -117,6 +123,8 @@ namespace MoneyEzBank.API
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<ITransactionService, TransactionService>();
+            services.AddScoped<IWebhookService, WebhookService>();
+            services.AddScoped<IWebhookConfigRepository, WebhookConfigRepository>();
 
             #endregion
 

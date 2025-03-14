@@ -7,6 +7,7 @@ using MoneyEzBank.Repositories.UnitOfWork;
 using MoneyEzBank.Repositories.Utils;
 using MoneyEzBank.Services.BusinessModels;
 using MoneyEzBank.Services.BusinessModels.TransactionModels;
+using MoneyEzBank.Services.BusinessModels.WebhookModels;
 using MoneyEzBank.Services.Constants;
 using MoneyEzBank.Services.Exceptions;
 using MoneyEzBank.Services.Services.Interfaces;
@@ -18,26 +19,51 @@ namespace MoneyEzBank.Services.Services.Implements
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IWebhookService _webhookService;
 
-        public TransactionService(IUnitOfWork unitOfWork, IMapper mapper)
+        public TransactionService(
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
+            IWebhookService webhookService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _webhookService = webhookService;
         }
 
-        public async Task<BaseResultModel> DepositAsync(CreateTransactionModel model)
+        private async Task NotifyBalanceChange(Account account, decimal oldBalance, decimal amount, TransactionType type, string transactionId, string description)
+        {
+            var payload = new WebhookPayload
+            {
+                AccountNumber = account.AccountNumber,
+                OldBalance = oldBalance,
+                NewBalance = account.Balance,
+                Amount = amount,
+                TransactionType = type,
+                Timestamp = CommonUtils.GetCurrentTime(),
+                TransactionId = transactionId,
+                Description = description
+            };
+
+            await _webhookService.NotifyBalanceChangeAsync(payload);
+        }
+
+        public async Task<BaseResultModel> DepositAsync(CreateDepositModel model)
         {
             if (model.Amount <= 0)
-                throw new DefaultException(MessageConstants.TRANSACTION_INVALID_AMOUNT_MESSAGE, 
+                throw new DefaultException(MessageConstants.TRANSACTION_INVALID_AMOUNT_MESSAGE,
                     MessageConstants.TRANSACTION_INVALID_AMOUNT_CODE);
 
-            var account = await _unitOfWork.AccountsRepository.GetByIdAsync(model.SourceAccountId)
-                ?? throw new NotExistException(MessageConstants.ACCOUNT_NOT_EXIST_MESSAGE, 
+            var account = await _unitOfWork.AccountsRepository.GetByIdAsync(model.AccountId)
+                ?? throw new NotExistException(MessageConstants.ACCOUNT_NOT_EXIST_MESSAGE,
                     MessageConstants.ACCOUNT_NOT_EXIST_CODE);
+
+            var oldBalance = account.Balance;
+            account.Balance += model.Amount;
 
             var transaction = new Transaction
             {
-                SourceAccountId = model.SourceAccountId,
+                SourceAccountId = model.AccountId,
                 Amount = model.Amount,
                 Type = TransactionType.Deposit,
                 Description = model.Description ?? "Deposit",
@@ -46,10 +72,11 @@ namespace MoneyEzBank.Services.Services.Implements
             };
 
             await _unitOfWork.TransactionsRepository.AddAsync(transaction);
-
-            account.Balance += model.Amount;
             _unitOfWork.AccountsRepository.UpdateAsync(account);
-            _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
+
+            // Notify after successful transaction
+            await NotifyBalanceChange(account, oldBalance, model.Amount, TransactionType.Deposit, transaction.Id.ToString(), transaction.Description);
 
             return new BaseResultModel
             {
@@ -59,13 +86,13 @@ namespace MoneyEzBank.Services.Services.Implements
             };
         }
 
-        public async Task<BaseResultModel> WithdrawAsync(CreateTransactionModel model)
+        public async Task<BaseResultModel> WithdrawAsync(CreateWithdrawModel model)
         {
             if (model.Amount <= 0)
                 throw new DefaultException(MessageConstants.TRANSACTION_INVALID_AMOUNT_MESSAGE,
                     MessageConstants.TRANSACTION_INVALID_AMOUNT_CODE);
 
-            var account = await _unitOfWork.AccountsRepository.GetByIdAsync(model.SourceAccountId)
+            var account = await _unitOfWork.AccountsRepository.GetByIdAsync(model.AccountId)
                 ?? throw new NotExistException(MessageConstants.ACCOUNT_NOT_EXIST_MESSAGE,
                     MessageConstants.ACCOUNT_NOT_EXIST_CODE);
 
@@ -73,9 +100,12 @@ namespace MoneyEzBank.Services.Services.Implements
                 throw new DefaultException(MessageConstants.ACCOUNT_INSUFFICIENT_FUNDS_MESSAGE,
                     MessageConstants.ACCOUNT_INSUFFICIENT_FUNDS_CODE);
 
+            var oldBalance = account.Balance;
+            account.Balance -= model.Amount;
+
             var transaction = new Transaction
             {
-                SourceAccountId = model.SourceAccountId,
+                SourceAccountId = model.AccountId,
                 Amount = model.Amount,
                 Type = TransactionType.Withdrawal,
                 Description = model.Description ?? "Withdrawal",
@@ -84,9 +114,11 @@ namespace MoneyEzBank.Services.Services.Implements
             };
 
             await _unitOfWork.TransactionsRepository.AddAsync(transaction);
-            account.Balance -= model.Amount;
             _unitOfWork.AccountsRepository.UpdateAsync(account);
             _unitOfWork.Save();
+
+            // Notify after successful transaction
+            await NotifyBalanceChange(account, oldBalance, model.Amount, TransactionType.Withdrawal, transaction.Id.ToString(), transaction.Description);
 
             return new BaseResultModel
             {
@@ -96,58 +128,67 @@ namespace MoneyEzBank.Services.Services.Implements
             };
         }
 
-        public async Task<BaseResultModel> TransferAsync(CreateTransactionModel model)
+        public async Task<BaseResultModel> TransferAsync(CreateTransferModel model)
         {
             if (model.Amount <= 0)
                 throw new DefaultException(MessageConstants.TRANSACTION_INVALID_AMOUNT_MESSAGE,
                     MessageConstants.TRANSACTION_INVALID_AMOUNT_CODE);
 
-            if (model.DestinationAccountId == null)
-                throw new DefaultException(MessageConstants.TRANSACTION_DESTINATION_REQUIRED_MESSAGE,
-                    MessageConstants.TRANSACTION_DESTINATION_REQUIRED_CODE);
-
-            if (model.SourceAccountId == model.DestinationAccountId)
-                throw new DefaultException(MessageConstants.ACCOUNT_SAME_TRANSFER_MESSAGE,
-                    MessageConstants.ACCOUNT_SAME_TRANSFER_CODE);
-
             var sourceAccount = await _unitOfWork.AccountsRepository.GetByIdAsync(model.SourceAccountId)
                 ?? throw new NotExistException(MessageConstants.ACCOUNT_NOT_EXIST_MESSAGE,
                     MessageConstants.ACCOUNT_NOT_EXIST_CODE);
 
-            var destinationAccount = await _unitOfWork.AccountsRepository.GetByIdAsync(model.DestinationAccountId.Value)
-                ?? throw new NotExistException(MessageConstants.ACCOUNT_DESTINATION_NOT_EXIST_MESSAGE,
-                    MessageConstants.ACCOUNT_DESTINATION_NOT_EXIST_CODE);
-
-            if (sourceAccount.Balance < model.Amount)
-                throw new DefaultException(MessageConstants.ACCOUNT_INSUFFICIENT_FUNDS_MESSAGE,
-                    MessageConstants.ACCOUNT_INSUFFICIENT_FUNDS_CODE);
-
-            var transaction = new Transaction
+            // check internal or external transfer
+            if (model.DestinationBank != "EZB")
             {
-                SourceAccountId = model.SourceAccountId,
-                DestinationAccountId = model.DestinationAccountId,
-                Amount = model.Amount,
-                Type = TransactionType.Transfer,
-                Description = model.Description ?? "Transfer",
-                TransactionDate = CommonUtils.GetCurrentTime(),
-                Status = TransactionStatus.SUCCESS.ToString()
-            };
+                var destinationAccount = await _unitOfWork.AccountsRepository.GetByAccountNumberAsync(model.DestinationAccountNumber)
+                    ?? throw new NotExistException(MessageConstants.ACCOUNT_DESTINATION_NOT_EXIST_MESSAGE,
+                        MessageConstants.ACCOUNT_DESTINATION_NOT_EXIST_CODE);
 
-            await _unitOfWork.TransactionsRepository.AddAsync(transaction);
-            sourceAccount.Balance -= model.Amount;
-            destinationAccount.Balance += model.Amount;
+                if (sourceAccount.Balance < model.Amount)
+                    throw new DefaultException(MessageConstants.ACCOUNT_INSUFFICIENT_FUNDS_MESSAGE,
+                        MessageConstants.ACCOUNT_INSUFFICIENT_FUNDS_CODE);
 
-            _unitOfWork.AccountsRepository.UpdateAsync(sourceAccount);
-            _unitOfWork.AccountsRepository.UpdateAsync(destinationAccount);
+                var sourceOldBalance = sourceAccount.Balance;
+                var destOldBalance = destinationAccount.Balance;
 
-            _unitOfWork.Save();
+                sourceAccount.Balance -= model.Amount;
+                destinationAccount.Balance += model.Amount;
 
-            return new BaseResultModel
+                var transaction = new Transaction
+                {
+                    SourceAccountId = model.SourceAccountId,
+                    DestinationAccountId = destinationAccount.Id,
+                    Amount = model.Amount,
+                    Type = TransactionType.Transfer,
+                    Description = model.Description ?? "Transfer",
+                    TransactionDate = CommonUtils.GetCurrentTime(),
+                    Status = TransactionStatus.SUCCESS.ToString()
+                };
+
+                await _unitOfWork.TransactionsRepository.AddAsync(transaction);
+                _unitOfWork.AccountsRepository.UpdateAsync(sourceAccount);
+                _unitOfWork.AccountsRepository.UpdateAsync(destinationAccount);
+                _unitOfWork.Save();
+
+                // Notify both accounts after successful transaction
+                await NotifyBalanceChange(sourceAccount, sourceOldBalance, model.Amount, TransactionType.Transfer, transaction.Id.ToString(), transaction.Description);
+                await NotifyBalanceChange(destinationAccount, destOldBalance, model.Amount, TransactionType.Transfer, transaction.Id.ToString(), transaction.Description);
+
+                return new BaseResultModel
+                {
+                    Status = StatusCodes.Status200OK,
+                    Message = MessageConstants.TRANSACTION_TRANSFER_SUCCESS_MESSAGE,
+                    Data = _mapper.Map<TransactionModel>(transaction)
+                };
+            } 
+            else
             {
-                Status = StatusCodes.Status200OK,
-                Message = MessageConstants.TRANSACTION_TRANSFER_SUCCESS_MESSAGE,
-                Data = _mapper.Map<TransactionModel>(transaction)
-            };
+                throw new DefaultException("External transfer is not supported yet", 
+                    MessageConstants.TRANSACTION_TRANSFER_EXTERNAL_NOT_SUPPORT_CODE);
+            }
+
+                
         }
 
         public async Task<BaseResultModel> GetTransactionsByAccountIdAsync(PaginationParameter paginationParameter, Guid accountId)
@@ -156,7 +197,7 @@ namespace MoneyEzBank.Services.Services.Implements
                 ?? throw new NotExistException(MessageConstants.ACCOUNT_NOT_EXIST_MESSAGE,
                     MessageConstants.ACCOUNT_NOT_EXIST_CODE);
 
-            var transactions = await _unitOfWork.TransactionsRepository.ToPaginationIncludeAsync(paginationParameter, 
+            var transactions = await _unitOfWork.TransactionsRepository.ToPaginationIncludeAsync(paginationParameter,
                     filter: t => t.DestinationAccountId == accountId || t.SourceAccountId == accountId);
 
             var transactionModels = _mapper.Map<List<TransactionModel>>(transactions);
