@@ -22,7 +22,7 @@ namespace MoneyEzBank.Services.Mappers
 
             // transaction mapper
             CreateMap<Transaction, TransactionModel>();
-            CreateMap<CreateTransactionModel, Transaction>();
+            CreateMap<CreateTransferModel, Transaction>();
             CreateMap<Pagination<Transaction>, Pagination<TransactionModel>>()
                 .ConvertUsing<PaginationConverter<Transaction, TransactionModel>>();
 

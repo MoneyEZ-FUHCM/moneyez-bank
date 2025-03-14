@@ -41,9 +41,9 @@ namespace MoneyEzBank.API.Controllers
 
         [HttpPost]
         [Authorize]
-        public Task<IActionResult> CreateAccount(CreateAccountModel model)
+        public Task<IActionResult> CreateAccount()
         {
-            return ValidateAndExecute(() => _accountService.CreateAccountAsync(model));
+            return ValidateAndExecute(() => _accountService.CreateAccountUserAsync());
         }
 
         [HttpPut]

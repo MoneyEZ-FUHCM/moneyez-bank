@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace MoneyEzBank.Services.BusinessModels.TransactionModels
 {
-    public class CreateTransactionModel
+    public class CreateWithdrawModel
     {
-        public Guid SourceAccountId { get; set; }
-        public Guid? DestinationAccountId { get; set; }
+        public Guid AccountId { get; set; }
         public decimal Amount { get; set; }
         public string? Description { get; set; }
     }
