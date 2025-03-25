@@ -16,9 +16,6 @@ namespace MoneyEzBank.Repositories.Entities.Configurations
 
             builder.Property(w => w.Secret)
                 .IsRequired();
-
-            builder.HasIndex(w => new { w.Url, w.Type })
-                .IsUnique();
         }
     }
 }
