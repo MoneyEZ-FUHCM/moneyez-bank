@@ -4,6 +4,7 @@ using MoneyEzBank.Repositories.Entities;
 using MoneyEzBank.Services.BusinessModels.AccountModels;
 using MoneyEzBank.Services.BusinessModels.TransactionModels;
 using MoneyEzBank.Services.BusinessModels.UserModels;
+using MoneyEzBank.Services.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,8 @@ namespace MoneyEzBank.Services.Mappers
                 .ConvertUsing<PaginationConverter<Transaction, TransactionModel>>();
 
             // account mapper
-            CreateMap<Account, AccountModel>();
+            CreateMap<Account, AccountModel>()
+                .ForMember(dest => dest.AccountHolder, opt => opt.MapFrom(src => src.User.FullName.ToUpper()));
             CreateMap<Pagination<Account>, Pagination<AccountModel>>().ConvertUsing<PaginationConverter<Account, AccountModel>>();
         }
 

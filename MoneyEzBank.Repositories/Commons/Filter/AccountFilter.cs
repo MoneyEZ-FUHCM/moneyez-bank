@@ -8,5 +8,6 @@ namespace MoneyEzBank.Repositories.Commons.Filter
 {
     public class AccountFilter : FilterBase
     {
+        public Guid? UserId { get; set; }
     }
 }

@@ -6,5 +6,6 @@ namespace MoneyEzBank.Services.BusinessModels.AccountModels
         public string AccountNumber { get; set; } = default!;
         public decimal Balance { get; set; }
         public Guid UserId { get; set; }
+        public string? AccountHolder { get; set; }
     }
 }

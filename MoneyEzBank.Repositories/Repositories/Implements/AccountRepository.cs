@@ -22,12 +22,12 @@ namespace MoneyEzBank.Repositories.Repositories.Implements
 
         public Task<Account> GetByAccountNumberAsync(string accountNumber)
         {
-            return _context.Accounts.FirstOrDefaultAsync(x => x.AccountNumber == accountNumber && x.IsDeleted == false);
+            return _context.Accounts.Include(a => a.User).FirstOrDefaultAsync(x => x.AccountNumber == accountNumber && x.IsDeleted == false);
         }
 
         public async Task<Pagination<Account>> GetByFilterAsync(PaginationParameter paginationParameter, AccountFilter filter)
         {
-            var query = _context.Accounts.AsQueryable();
+            var query = _context.Accounts.Include(a => a.User).AsQueryable();
 
             // apply filter
             query = ApplyAccountFiltering(query, filter);
@@ -44,6 +44,11 @@ namespace MoneyEzBank.Repositories.Repositories.Implements
         private IQueryable<Account> ApplyAccountFiltering(IQueryable<Account> query, AccountFilter filter)
         {
             if (filter == null) return query;
+
+            if (filter.UserId.HasValue)
+            {
+                query = query.Where(u => u.UserId == filter.UserId);
+            }
 
             // Apply IsDeleted filter
             query = query.Where(u => u.IsDeleted == filter.IsDeleted);

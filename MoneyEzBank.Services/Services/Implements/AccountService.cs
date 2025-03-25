@@ -13,6 +13,8 @@ using MoneyEzBank.Services.BusinessModels;
 using AutoMapper;
 using MoneyEzBank.Services.Utils;
 using System;
+using MoneyEzBank.Repositories.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace MoneyEzBank.Services.Services.Implements
 {
@@ -31,7 +33,7 @@ namespace MoneyEzBank.Services.Services.Implements
 
         public async Task<BaseResultModel> GetByIdAsync(Guid id)
         {
-            var account = await _unitOfWork.AccountsRepository.GetByIdAsync(id);
+            var account = await _unitOfWork.AccountsRepository.GetByIdIncludeAsync(id, include: a => a.Include(a => a.User));
             if (account == null)
                 throw new NotExistException($"Account with ID {id} not found", MessageConstants.ACCOUNT_NOT_EXIST_CODE);
 
@@ -124,7 +126,23 @@ namespace MoneyEzBank.Services.Services.Implements
 
         public async Task<BaseResultModel> GetAccountsByFilterAsync(PaginationParameter paginationParameter, AccountFilter filter)
         {
-            var accounts = await _unitOfWork.AccountsRepository.GetByFilterAsync(paginationParameter, filter);
+            var user = await _unitOfWork.UsersRepository.GetUserByEmailAsync(_claimsService.GetCurrentUserEmail);
+            if (user == null)
+            {
+                throw new NotExistException($"User not found", MessageConstants.USER_NOT_EXIST_CODE);
+            }
+
+            var accounts = new Pagination<Account>();
+
+            if (user.Role == Roles.ADMIN)
+            {
+                accounts = await _unitOfWork.AccountsRepository.GetByFilterAsync(paginationParameter, filter);
+            }
+            else
+            {
+                filter.UserId = user.Id;
+                accounts = await _unitOfWork.AccountsRepository.GetByFilterAsync(paginationParameter, filter);
+            }
 
             var accountModels = _mapper.Map<List<AccountModel>>(accounts);
 
