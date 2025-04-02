@@ -15,6 +15,8 @@ namespace MoneyEzBank.Repositories.Entities.Configurations
                 .IsRequired()
                 .HasMaxLength(20);
 
+            builder.Property(a => a.AccountHolder).IsRequired().HasMaxLength(250);
+
             builder.Property(a => a.Balance)
                 .HasPrecision(18, 2);
 

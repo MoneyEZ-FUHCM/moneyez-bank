@@ -19,5 +19,8 @@ namespace MoneyEzBank.Services.BusinessModels.WebhookModels
         [Required(ErrorMessage = "Account number is required")]
         [StringLength(20, ErrorMessage = "Account number cannot exceed 20 characters")]
         public required string AccountNumber { get; set; }
+
+        [Required(ErrorMessage = "Account holder is required")]
+        public required string AccountHolder { get; set; }
     }
 }

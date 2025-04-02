@@ -28,8 +28,7 @@ namespace MoneyEzBank.Services.Mappers
                 .ConvertUsing<PaginationConverter<Transaction, TransactionModel>>();
 
             // account mapper
-            CreateMap<Account, AccountModel>()
-                .ForMember(dest => dest.AccountHolder, opt => opt.MapFrom(src => src.User.FullName.ToUpper()));
+            CreateMap<Account, AccountModel>();
             CreateMap<Pagination<Account>, Pagination<AccountModel>>().ConvertUsing<PaginationConverter<Account, AccountModel>>();
         }
 

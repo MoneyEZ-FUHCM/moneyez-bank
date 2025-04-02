@@ -4,8 +4,8 @@ namespace MoneyEzBank.Services.BusinessModels.AccountModels
     {
         public Guid Id { get; set; }
         public string AccountNumber { get; set; } = default!;
+        public string? AccountHolder { get; set; }
         public decimal Balance { get; set; }
         public Guid UserId { get; set; }
-        public string? AccountHolder { get; set; }
     }
 }
