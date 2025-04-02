@@ -8,6 +8,7 @@ namespace MoneyEzBank.Services.Services.Interfaces
     {
         Task NotifyBalanceChangeAsync(WebhookPayload payload);
         Task<BaseResultModel> RegisterWebhookAsync(WebhookRequestModel model);
+        Task<BaseResultModel> CancelWebhookAsync(string secret);
         Task<BaseResultModel> GetWebhookByIdAsync(Guid id);
         Task<BaseResultModel> UpdateWebhookAsync(Guid id, WebhookRequestModel model);
         Task<BaseResultModel> DeleteWebhookAsync(Guid id);

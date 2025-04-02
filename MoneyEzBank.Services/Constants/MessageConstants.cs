@@ -50,5 +50,7 @@ namespace MoneyEzBank.Services.Constants
 
         // webhook
         public const string WEBHOOK_NOT_EXIST_CODE = "WebhookNotExist";
+        public const string WEBHOOK_MISMATCH_URL = "WebhookMismatchUrl";
+
     }
 }
