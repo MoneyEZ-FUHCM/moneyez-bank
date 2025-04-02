@@ -191,5 +191,26 @@ namespace MoneyEzBank.Services.Services.Implements
                 Data = webhooks
             };
         }
+
+        public async Task<BaseResultModel> CancelWebhookAsync(string secret)
+        {
+            var webhooks = await _unitOfWork.WebhookConfigRepository.GetByConditionAsync(filter: w => w.Secret == secret);
+            if (!webhooks.Any())
+            {
+                throw new NotExistException("", MessageConstants.WEBHOOK_NOT_EXIST_CODE);
+            }
+
+            var webhook = webhooks.First();
+
+            _unitOfWork.WebhookConfigRepository.PermanentDeletedAsync(webhook);
+
+            await _unitOfWork.SaveAsync();
+
+            return new BaseResultModel
+            {
+                Status = StatusCodes.Status200OK,
+                Message = "Webhook deleted successfully"
+            };
+        }
     }
 }
