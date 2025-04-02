@@ -36,6 +36,7 @@ namespace MoneyEzBank.Services.Constants
         public const string ACCOUNT_CREATE_SUCCESS_MESSAGE = "Account created successfully";
         public const string ACCOUNT_UPDATE_SUCCESS_MESSAGE = "Account updated successfully";
         public const string ACCOUNT_CREATE_FAIL_MESSAGE_CODE = "AccountCreatedFailed";
+        public const string ACCOUNT_MISMATCH_ACCOUNT_HOLDER = "AccountMismatchAccountHolder";
 
         // transaction
         public const string TRANSACTION_INVALID_AMOUNT_CODE = "InvalidTransactionAmount";

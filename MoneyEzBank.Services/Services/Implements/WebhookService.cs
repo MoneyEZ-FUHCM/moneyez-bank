@@ -97,6 +97,11 @@ namespace MoneyEzBank.Services.Services.Implements
                 throw new NotExistException("", MessageConstants.ACCOUNT_NOT_EXIST_CODE);
             }
 
+            if (account.AccountHolder != model.AccountHolder)
+            {
+                throw new DefaultException("", MessageConstants.ACCOUNT_MISMATCH_ACCOUNT_HOLDER);
+            }
+
             var webhook = new WebhookConfig
             {
                 Url = model.Url,

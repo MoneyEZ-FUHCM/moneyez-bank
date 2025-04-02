@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MoneyEzBank.Repositories.Entities;
 
@@ -11,9 +12,11 @@ using MoneyEzBank.Repositories.Entities;
 namespace MoneyEzBank.Repositories.Migrations
 {
     [DbContext(typeof(MoneyEzBankContext))]
-    partial class MoneyEzBankContextModelSnapshot : ModelSnapshot
+    [Migration("20250402152739_UpdateTableAccount")]
+    partial class UpdateTableAccount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
