@@ -119,8 +119,7 @@ namespace MoneyEzBank.Services.Services.Implements
             return new BaseResultModel
             {
                 Status = StatusCodes.Status201Created,
-                Message = "Webhook registered successfully",
-                Data = webhook
+                Message = "Webhook registered successfully"
             };
         }
 
