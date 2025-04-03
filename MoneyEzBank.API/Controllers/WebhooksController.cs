@@ -23,6 +23,12 @@ namespace MoneyEzBank.API.Controllers
             return ValidateAndExecute(() => _webhookService.RegisterWebhookAsync(model));
         }
 
+        [HttpPost("validate")]
+        public Task<IActionResult> Validate([FromBody] ValidateBankAccountRequestModel model)
+        {
+            return ValidateAndExecute(() => _webhookService.ValidateBankAccountWebhook(model));
+        }
+
         [HttpDelete("cancel/{secret}")]
         public Task<IActionResult> Cancel(string secret)
         {

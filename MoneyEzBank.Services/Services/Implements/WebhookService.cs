@@ -212,5 +212,30 @@ namespace MoneyEzBank.Services.Services.Implements
                 Message = "Webhook deleted successfully"
             };
         }
+
+        public async Task<BaseResultModel> ValidateBankAccountWebhook(ValidateBankAccountRequestModel model)
+        {
+            // validate account number and holder
+            var account = await _unitOfWork.AccountsRepository.GetByAccountNumberAsync(model.AccountNumber);
+            if (account != null)
+            {
+                if (account.AccountHolder != model.AccountHolder)
+                {
+                    throw new DefaultException("", MessageConstants.ACCOUNT_MISMATCH_ACCOUNT_HOLDER);
+                }
+                else
+                {
+                    return new BaseResultModel
+                    {
+                        Status = StatusCodes.Status200OK,
+                        Message = "Account is valid"
+                    };
+                }
+            }
+            else
+            {
+                throw new NotExistException("", MessageConstants.ACCOUNT_NOT_EXIST_CODE);
+            }
+        }
     }
 }

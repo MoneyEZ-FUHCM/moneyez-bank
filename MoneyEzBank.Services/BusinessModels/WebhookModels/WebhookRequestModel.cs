@@ -24,14 +24,9 @@ namespace MoneyEzBank.Services.BusinessModels.WebhookModels
         public required string AccountHolder { get; set; }
     }
 
-    public class CancelWebhookRequestModel
+    public class ValidateBankAccountRequestModel
     {
-        [Required(ErrorMessage = "URL is required")]
-        [Url(ErrorMessage = "A valid URL is required")]
-        public required string Url { get; set; }
-        [Required(ErrorMessage = "Secret is required")]
-        [MinLength(32, ErrorMessage = "Secret must be at least 32 characters long")]
-        [MaxLength(256, ErrorMessage = "Secret cannot exceed 256 characters")]
-        public required string Secret { get; set; }
+        public required string AccountHolder { get; set; }
+        public required string AccountNumber { get; set; }
     }
 }
