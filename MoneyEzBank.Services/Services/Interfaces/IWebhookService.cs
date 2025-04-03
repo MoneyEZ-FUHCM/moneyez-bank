@@ -13,5 +13,6 @@ namespace MoneyEzBank.Services.Services.Interfaces
         Task<BaseResultModel> UpdateWebhookAsync(Guid id, WebhookRequestModel model);
         Task<BaseResultModel> DeleteWebhookAsync(Guid id);
         Task<BaseResultModel> GetWebhooksByAccountIdAsync(Guid accountId, PaginationParameter paginationParameter);
+        Task<BaseResultModel> ValidateBankAccountWebhook(ValidateBankAccountRequestModel model);
     }
 }
