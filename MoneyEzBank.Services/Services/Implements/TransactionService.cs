@@ -42,7 +42,8 @@ namespace MoneyEzBank.Services.Services.Implements
                 TransactionType = type,
                 Timestamp = CommonUtils.GetCurrentTime(),
                 TransactionId = transactionId,
-                Description = description
+                Description = description,
+                BankName = "EZB"
             };
 
             await _webhookService.NotifyBalanceChangeAsync(payload);
