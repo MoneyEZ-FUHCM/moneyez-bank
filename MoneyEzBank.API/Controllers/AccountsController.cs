@@ -46,6 +46,13 @@ namespace MoneyEzBank.API.Controllers
             return ValidateAndExecute(() => _accountService.CreateAccountUserAsync());
         }
 
+        [HttpPost("admin")]
+        [Authorize(Roles = "ADMIN")]
+        public Task<IActionResult> CreateAccountAdmin(CreateAccountModel createAccountModel)
+        {
+            return ValidateAndExecute(() => _accountService.CreateAccountAdminAsync(createAccountModel));
+        }
+
         [HttpPut]
         [Authorize]
         public Task<IActionResult> UpdateAccount(UpdateAccountModel model)

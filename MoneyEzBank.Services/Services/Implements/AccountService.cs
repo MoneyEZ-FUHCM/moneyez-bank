@@ -57,7 +57,7 @@ namespace MoneyEzBank.Services.Services.Implements
             };
         }
 
-        public async Task<BaseResultModel> CreateAccountAsync(CreateAccountModel model)
+        public async Task<BaseResultModel> CreateAccountAdminAsync(CreateAccountModel model)
         {
             // Validate user exists
             var user = await _unitOfWork.UsersRepository.GetByIdAsync(model.UserId);

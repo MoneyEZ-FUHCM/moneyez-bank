@@ -7,7 +7,7 @@ namespace MoneyEzBank.Services.BusinessModels.AccountModels
         [Required]
         [StringLength(12)]
         public string AccountNumber { get; set; } = default!;
-        public decimal InitialBalance { get; set; }
+        public decimal InitialBalance { get; set; } = 0;
         public Guid UserId { get; set; }
     }
 }

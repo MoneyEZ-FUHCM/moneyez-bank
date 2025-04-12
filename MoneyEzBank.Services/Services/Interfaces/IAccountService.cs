@@ -9,7 +9,7 @@ namespace MoneyEzBank.Services.Services.Interfaces
     {
         Task<BaseResultModel> GetByIdAsync(Guid id);
         Task<BaseResultModel> GetByAccountNumberAsync(string accountNumber);
-        Task<BaseResultModel> CreateAccountAsync(CreateAccountModel model);
+        Task<BaseResultModel> CreateAccountAdminAsync(CreateAccountModel model);
         Task<BaseResultModel> UpdateAccountAsync(UpdateAccountModel model);
         Task<BaseResultModel> GetAccountsByFilterAsync(PaginationParameter paginationParameter, AccountFilter filter);
         Task<BaseResultModel> CreateAccountUserAsync();
