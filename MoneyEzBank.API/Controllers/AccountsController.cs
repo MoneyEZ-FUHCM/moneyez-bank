@@ -59,5 +59,12 @@ namespace MoneyEzBank.API.Controllers
         {
             return ValidateAndExecute(() => _accountService.UpdateAccountAsync(model));
         }
+
+        [HttpDelete("admin")]
+        [Authorize(Roles = "ADMIN")]
+        public Task<IActionResult> DeleteAccountById(Guid id)
+        {
+            return ValidateAndExecute(() => _accountService.DeleteAccountById(id));
+        }
     }
 }
