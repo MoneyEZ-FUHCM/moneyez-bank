@@ -37,6 +37,9 @@ namespace MoneyEzBank.Services.Constants
         public const string ACCOUNT_UPDATE_SUCCESS_MESSAGE = "Account updated successfully";
         public const string ACCOUNT_CREATE_FAIL_MESSAGE_CODE = "AccountCreatedFailed";
         public const string ACCOUNT_MISMATCH_ACCOUNT_HOLDER = "AccountMismatchAccountHolder";
+        public const string ACCOUNT_LINKED_TO_WEBHOOK_CODE = "AccountLinkedToWebhook";
+        public const string ACCOUNT_LINKED_TO_WEBHOOK_MESSAGE = "Cannot delete account with linked webhooks";
+        public const string ACCOUNT_DELETE_SUCCESS_MESSAGE = "Account deleted successfully";
 
         // transaction
         public const string TRANSACTION_INVALID_AMOUNT_CODE = "InvalidTransactionAmount";

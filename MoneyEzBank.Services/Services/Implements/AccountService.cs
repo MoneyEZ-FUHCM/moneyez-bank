@@ -202,5 +202,56 @@ namespace MoneyEzBank.Services.Services.Implements
 
             return result;
         }
+
+        public async Task<BaseResultModel> DeleteAccountById(Guid id)
+        {
+            // Verify the account exists
+            var account = await _unitOfWork.AccountsRepository.GetByIdAsync(id);
+            if (account == null)
+                throw new NotExistException($"Account with ID {id} not found", MessageConstants.ACCOUNT_NOT_EXIST_CODE);
+
+            // Check if the account has any webhooks linked to it
+            var webhooks = await _unitOfWork.WebhookConfigRepository.GetByConditionAsync(
+                filter: w => w.AccountId == id && !w.IsDeleted);
+
+            // If webhooks exist, throw an exception with the error message
+            if (webhooks != null && webhooks.Any())
+            {
+                throw new DefaultException(
+                    MessageConstants.ACCOUNT_LINKED_TO_WEBHOOK_MESSAGE,
+                    MessageConstants.ACCOUNT_LINKED_TO_WEBHOOK_CODE);
+            }
+
+            //// Find all transactions where this account is the source or destination
+            //var sourceTransactions = await _unitOfWork.TransactionsRepository.GetByConditionAsync(
+            //    filter: t => t.SourceAccountId == id);
+            
+            //var destinationTransactions = await _unitOfWork.TransactionsRepository.GetByConditionAsync(
+            //    filter: t => t.DestinationAccountId == id);
+
+            //// Delete all source transactions
+            //if (sourceTransactions != null && sourceTransactions.Any())
+            //{
+            //    _unitOfWork.TransactionsRepository.PermanentDeletedListAsync(sourceTransactions);
+            //}
+
+            //// Delete all destination transactions
+            //if (destinationTransactions != null && destinationTransactions.Any())
+            //{
+            //    _unitOfWork.TransactionsRepository.PermanentDeletedListAsync(destinationTransactions);
+            //}
+
+            // Delete the account
+            _unitOfWork.AccountsRepository.SoftDeleteAsync(account);
+            
+            // Save all changes in one transaction
+            await _unitOfWork.SaveAsync();
+
+            return new BaseResultModel
+            {
+                Status = StatusCodes.Status200OK,
+                Message = MessageConstants.ACCOUNT_DELETE_SUCCESS_MESSAGE
+            };
+        }
     }
 }
