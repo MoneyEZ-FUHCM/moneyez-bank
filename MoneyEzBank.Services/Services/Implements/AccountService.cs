@@ -76,6 +76,7 @@ namespace MoneyEzBank.Services.Services.Implements
             var account = new Account
             {
                 AccountNumber = model.AccountNumber,
+                AccountHolder = StringUtils.ConvertToUnSign(user.FullName).ToUpper(),
                 Balance = model.InitialBalance,
                 UserId = model.UserId
             };
