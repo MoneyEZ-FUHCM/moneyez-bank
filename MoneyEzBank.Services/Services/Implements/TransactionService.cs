@@ -140,7 +140,7 @@ namespace MoneyEzBank.Services.Services.Implements
                     MessageConstants.ACCOUNT_NOT_EXIST_CODE);
 
             // check internal or external transfer
-            if (model.DestinationBank != "EZB")
+            if (model.DestinationBank == "EZB")
             {
                 var destinationAccount = await _unitOfWork.AccountsRepository.GetByAccountNumberAsync(model.DestinationAccountNumber)
                     ?? throw new NotExistException(MessageConstants.ACCOUNT_DESTINATION_NOT_EXIST_MESSAGE,
