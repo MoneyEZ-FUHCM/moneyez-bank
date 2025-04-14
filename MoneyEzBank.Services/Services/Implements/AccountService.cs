@@ -261,7 +261,7 @@ namespace MoneyEzBank.Services.Services.Implements
             return new BaseResultModel
             {
                 Status = StatusCodes.Status200OK,
-                Data = _mapper.Map<AccountModel>(accounts)
+                Data = _mapper.Map<List<AccountModel>>(accounts)
             };
         }
     }
