@@ -254,5 +254,15 @@ namespace MoneyEzBank.Services.Services.Implements
                 Message = MessageConstants.ACCOUNT_DELETE_SUCCESS_MESSAGE
             };
         }
+
+        public async Task<BaseResultModel> GetAllAccountsAsync()
+        {
+            var accounts = await _unitOfWork.AccountsRepository.GetAllAsync();
+            return new BaseResultModel
+            {
+                Status = StatusCodes.Status200OK,
+                Data = _mapper.Map<AccountModel>(accounts)
+            };
+        }
     }
 }
