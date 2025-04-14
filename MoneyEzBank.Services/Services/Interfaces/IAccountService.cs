@@ -14,5 +14,6 @@ namespace MoneyEzBank.Services.Services.Interfaces
         Task<BaseResultModel> GetAccountsByFilterAsync(PaginationParameter paginationParameter, AccountFilter filter);
         Task<BaseResultModel> CreateAccountUserAsync();
         Task<BaseResultModel> DeleteAccountById(Guid id);
+        Task<BaseResultModel> GetAllAccountsAsync();
     }
 }

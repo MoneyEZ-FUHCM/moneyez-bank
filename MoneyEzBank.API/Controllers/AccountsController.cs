@@ -25,6 +25,13 @@ namespace MoneyEzBank.API.Controllers
             return ValidateAndExecute(() => _accountService.GetAccountsByFilterAsync(paginationParameter, filter));
         }
 
+        [HttpGet("all")]
+        [Authorize]
+        public Task<IActionResult> GetAllAccounts()
+        {
+            return ValidateAndExecute(() => _accountService.GetAllAccountsAsync());
+        }
+
         [HttpGet("{id}")]
         [Authorize]
         public Task<IActionResult> GetAccountById(Guid id)
