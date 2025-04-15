@@ -199,9 +199,33 @@ namespace MoneyEzBank.Services.Services.Implements
                     MessageConstants.ACCOUNT_NOT_EXIST_CODE);
 
             var transactions = await _unitOfWork.TransactionsRepository.ToPaginationIncludeAsync(paginationParameter,
-                    filter: t => t.DestinationAccountId == accountId || t.SourceAccountId == accountId);
+                    filter: t => t.DestinationAccountId == accountId || t.SourceAccountId == accountId,
+                    orderBy: t => t.OrderByDescending(t => t.TransactionDate)
+                );
 
             var transactionModels = _mapper.Map<List<TransactionModel>>(transactions);
+            
+            // Process transaction direction for each transaction
+            foreach (var transaction in transactionModels)
+            {
+                // Set the transaction direction based on whether the account is source or destination
+                if (transaction.Type == TransactionType.Transfer)
+                {
+                    // For transfers: negative for source account, positive for destination account
+                    if (transaction.SourceAccountId == accountId)
+                        transaction.TransactionDirection = -1 * transaction.Amount; // Outgoing transfer (negative)
+                    else if (transaction.DestinationAccountId == accountId)
+                        transaction.TransactionDirection = transaction.Amount; // Incoming transfer (positive)
+                }
+                else if (transaction.Type == TransactionType.Deposit)
+                {
+                    transaction.TransactionDirection = transaction.Amount; // Deposits are always positive
+                }
+                else if (transaction.Type == TransactionType.Withdrawal)
+                {
+                    transaction.TransactionDirection = -1 * transaction.Amount; // Withdrawals are always negative
+                }
+            }
 
             var result = PaginationHelper.GetPaginationResult(transactions, transactionModels);
 
