@@ -17,5 +17,6 @@ namespace MoneyEzBank.Services.BusinessModels.TransactionModels
         public string? Description { get; set; }
         public DateTime TransactionDate { get; set; }
         public string Status { get; set; } = default!;
+        public decimal TransactionDirection { get; set; } // New field to indicate positive or negative direction
     }
 }
