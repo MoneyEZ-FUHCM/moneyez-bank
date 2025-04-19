@@ -22,7 +22,11 @@ namespace MoneyEzBank.Services.Mappers
             CreateMap<Pagination<User>, Pagination<UserModel>>().ConvertUsing<PaginationConverter<User, UserModel>>();
 
             // transaction mapper
-            CreateMap<Transaction, TransactionModel>();
+            CreateMap<Transaction, TransactionModel>()
+                .ForMember(dest => dest.SourceAccountHolder, otp => otp.MapFrom(src => src.SourceAccount.AccountHolder))
+                .ForMember(dest => dest.SourceAccountNumber, otp => otp.MapFrom(src => src.SourceAccount.AccountNumber))
+                .ForMember(dest => dest.DestinationAccountHolder, otp => otp.MapFrom(src => src.DestinationAccount.AccountHolder))
+                .ForMember(dest => dest.DestinationAccountNumber, otp => otp.MapFrom(src => src.DestinationAccount.AccountNumber));
             CreateMap<CreateTransferModel, Transaction>();
             CreateMap<Pagination<Transaction>, Pagination<TransactionModel>>()
                 .ConvertUsing<PaginationConverter<Transaction, TransactionModel>>();

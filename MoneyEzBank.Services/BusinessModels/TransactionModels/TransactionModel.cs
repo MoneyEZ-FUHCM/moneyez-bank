@@ -8,7 +8,7 @@ using MoneyEzBank.Repositories.Enums;
 
 namespace MoneyEzBank.Services.BusinessModels.TransactionModels
 {
-    public class TransactionModel :  BaseEntity
+    public class TransactionModel : BaseEntity
     {
         public Guid SourceAccountId { get; set; }
         public Guid? DestinationAccountId { get; set; }
@@ -17,6 +17,10 @@ namespace MoneyEzBank.Services.BusinessModels.TransactionModels
         public string? Description { get; set; }
         public DateTime TransactionDate { get; set; }
         public string Status { get; set; } = default!;
-        public decimal TransactionDirection { get; set; } // New field to indicate positive or negative direction
+        public decimal TransactionDirection { get; set; }
+        public string? SourceAccountNumber { get; set; }
+        public string? SourceAccountHolder { get; set; }
+        public string? DestinationAccountNumber { get; set; }
+        public string? DestinationAccountHolder { get; set; }
     }
 }
