@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using MoneyEzBank.Repositories.Commons;
 using MoneyEzBank.Repositories.Entities;
 using MoneyEzBank.Repositories.Enums;
@@ -200,12 +201,14 @@ namespace MoneyEzBank.Services.Services.Implements
 
             var transactions = await _unitOfWork.TransactionsRepository.ToPaginationIncludeAsync(paginationParameter,
                     filter: t => t.DestinationAccountId == accountId || t.SourceAccountId == accountId,
+                    include: t => t.Include(t => t.SourceAccount)
+                        .Include(t => t.DestinationAccount),
                     orderBy: t => t.OrderByDescending(t => t.TransactionDate)
                 );
 
             var transactionModels = _mapper.Map<List<TransactionModel>>(transactions);
             
-            // Process transaction direction for each transaction
+            // Process transaction direction and add account information for each transaction
             foreach (var transaction in transactionModels)
             {
                 // Set the transaction direction based on whether the account is source or destination
