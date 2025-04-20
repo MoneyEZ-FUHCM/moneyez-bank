@@ -4,6 +4,7 @@ using MoneyEzBank.Repositories.Entities;
 using MoneyEzBank.Services.BusinessModels.AccountModels;
 using MoneyEzBank.Services.BusinessModels.TransactionModels;
 using MoneyEzBank.Services.BusinessModels.UserModels;
+using MoneyEzBank.Services.BusinessModels.WebhookModels;
 using MoneyEzBank.Services.Utils;
 using System;
 using System.Collections.Generic;
@@ -34,6 +35,12 @@ namespace MoneyEzBank.Services.Mappers
             // account mapper
             CreateMap<Account, AccountModel>();
             CreateMap<Pagination<Account>, Pagination<AccountModel>>().ConvertUsing<PaginationConverter<Account, AccountModel>>();
+
+            // webhook mapper
+            CreateMap<WebhookConfig, WebhookConfigModel>()
+                .ForMember(dest => dest.AccountHolder, otp => otp.MapFrom(src => src.Account.AccountHolder))
+                .ForMember(dest => dest.AccountNumber, otp => otp.MapFrom(src => src.Account.AccountNumber));
+            CreateMap<Pagination<WebhookConfig>, Pagination<WebhookConfigModel>>().ConvertUsing<PaginationConverter<WebhookConfig, WebhookConfigModel>>();
         }
 
         public class PaginationConverter<TSource, TDestination> : ITypeConverter<Pagination<TSource>, Pagination<TDestination>>
