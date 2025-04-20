@@ -62,5 +62,12 @@ namespace MoneyEzBank.API.Controllers
         {
             return ValidateAndExecute(() => _webhookService.GetWebhooksByAccountIdAsync(accountId, paginationParameter));
         }
+
+        [HttpGet("admin")]
+        [Authorize(Roles = "ADMIN")]
+        public Task<IActionResult> GetWebhooksAdmin([FromQuery] PaginationParameter paginationParameter)
+        {
+            return ValidateAndExecute(() => _webhookService.GetWebhooksAdminAsync(paginationParameter));
+        }
     }
 }

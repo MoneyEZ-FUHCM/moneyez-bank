@@ -1,8 +1,10 @@
 using System.Text;
 using System.Text.Json;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Identity.Client;
 using MoneyEzBank.Repositories.Commons;
 using MoneyEzBank.Repositories.Entities;
 using MoneyEzBank.Repositories.Enums;
@@ -13,6 +15,7 @@ using MoneyEzBank.Services.BusinessModels.WebhookModels;
 using MoneyEzBank.Services.Constants;
 using MoneyEzBank.Services.Exceptions;
 using MoneyEzBank.Services.Services.Interfaces;
+using MoneyEzBank.Services.Utils;
 
 namespace MoneyEzBank.Services.Services.Implements
 {
@@ -21,15 +24,18 @@ namespace MoneyEzBank.Services.Services.Implements
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
         public WebhookService(
             IHttpClientFactory httpClientFactory,
             IConfiguration configuration,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IMapper mapper)
         {
             _httpClient = httpClientFactory.CreateClient("WebhookClient");
             _configuration = configuration;
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public async Task NotifyBalanceChangeAsync(WebhookPayload payload)
@@ -134,7 +140,7 @@ namespace MoneyEzBank.Services.Services.Implements
             return new BaseResultModel
             {
                 Status = StatusCodes.Status200OK,
-                Data = webhook
+                Data = _mapper.Map<WebhookConfigModel>(webhook)
             };
         }
 
@@ -156,7 +162,7 @@ namespace MoneyEzBank.Services.Services.Implements
             {
                 Status = StatusCodes.Status200OK,
                 Message = "Webhook updated successfully",
-                Data = webhook
+                Data = _mapper.Map<WebhookConfigModel>(webhook)
             };
         }
 
@@ -182,13 +188,18 @@ namespace MoneyEzBank.Services.Services.Implements
         {
             var webhooks = await _unitOfWork.WebhookConfigRepository.ToPaginationIncludeAsync(
                 paginationParameter,
-                filter: w => w.AccountId == accountId && !w.IsDeleted
+                filter: w => w.AccountId == accountId && !w.IsDeleted,
+                include: w => w.Include(w => w.Account),
+                orderBy: w => w.OrderByDescending(w => w.CreatedAt)
             );
+
+            var webhookModels = _mapper.Map<List<WebhookConfigModel>>(webhooks);
+            var result = PaginationHelper.GetPaginationResult(webhooks, webhookModels);
 
             return new BaseResultModel
             {
                 Status = StatusCodes.Status200OK,
-                Data = webhooks
+                Data = result
             };
         }
 
@@ -236,6 +247,25 @@ namespace MoneyEzBank.Services.Services.Implements
             {
                 throw new NotExistException("", MessageConstants.ACCOUNT_NOT_EXIST_CODE);
             }
+        }
+
+        public async Task<BaseResultModel> GetWebhooksAdminAsync(PaginationParameter paginationParameter)
+        {
+            var webhooks = await _unitOfWork.WebhookConfigRepository.ToPaginationIncludeAsync(
+            paginationParameter,
+                filter: w => !w.IsDeleted,
+                include: w => w.Include(w => w.Account),
+                orderBy: w => w.OrderByDescending(w => w.CreatedAt)
+            );
+
+            var webhookModels = _mapper.Map<List<WebhookConfigModel>>(webhooks);
+            var result = PaginationHelper.GetPaginationResult(webhooks, webhookModels);
+
+            return new BaseResultModel
+            {
+                Status = StatusCodes.Status200OK,
+                Data = result
+            };
         }
     }
 }
