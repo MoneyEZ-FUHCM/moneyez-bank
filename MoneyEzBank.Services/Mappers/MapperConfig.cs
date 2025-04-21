@@ -21,6 +21,7 @@ namespace MoneyEzBank.Services.Mappers
             // user mapper
             CreateMap<User, UserModel>();
             CreateMap<Pagination<User>, Pagination<UserModel>>().ConvertUsing<PaginationConverter<User, UserModel>>();
+            CreateMap<CreateUserModel, User>();
 
             // transaction mapper
             CreateMap<Transaction, TransactionModel>()
